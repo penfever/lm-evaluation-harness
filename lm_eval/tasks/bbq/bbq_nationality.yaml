@@ -1,0 +1,4 @@
+"task": "bbq_nationality"
+"test_split": "nationality"
+"include": "_default_template_yaml"
+"description": "The following are multiple choice questions (with answers) about nationality.\n\n"

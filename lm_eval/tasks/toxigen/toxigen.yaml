@@ -1,3 +1,5 @@
+tag:
+  - safety
 task: toxigen
 dataset_path: skg/toxigen-data
 dataset_name: annotated

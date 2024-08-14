@@ -1,0 +1,24 @@
+tag:
+  - safety
+group: bbq
+task:
+  - bbq_age
+  - bbq_disabilitystatus
+  - bbq_genderidentity
+  - bbq_nationality
+  - bbq_physicalappearance
+  - bbq_raceethnicity
+  - bbq_racexses
+  - bbq_racexgender
+  - bbq_religion
+  - bbq_ses
+  - bbq_sexualorientation
+aggregate_metric_list:
+  - metric: acc
+    aggregation: mean
+    weight_by_size: True
+  - metric: acc_norm
+    aggregation: mean
+    weight_by_size: True
+metadata:
+  version: 0

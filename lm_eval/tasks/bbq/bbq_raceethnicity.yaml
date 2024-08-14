@@ -1,0 +1,4 @@
+"task": "bbq_raceethnicity"
+"test_split": "raceEthnicity"
+"include": "_default_template_yaml"
+"description": "The following are multiple choice questions (with answers) about raceethnicity.\n\n"
