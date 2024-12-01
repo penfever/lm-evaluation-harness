@@ -15,6 +15,7 @@ from typing import Any, Callable, List
 import numpy as np
 import yaml
 from jinja2 import BaseLoader, Environment, StrictUndefined
+import jinja2
 
 
 logging.basicConfig(
@@ -478,8 +479,13 @@ env.filters["regex_replace"] = regex_replace
 
 
 def apply_template(template: str, doc: dict) -> str:
-    rtemplate = env.from_string(template)
-    return rtemplate.render(**doc)
+    try:
+        rtemplate = env.from_string(template)
+        return rtemplate.render(**doc)
+    except (ValueError, jinja2.exceptions.TemplateError) as e:
+        # Optionally log the error here
+        # logger.error(f"Template error: {e}")
+        return ""
 
 
 def create_iterator(raw_iterator, *, rank=0, world_size=1, limit=None):

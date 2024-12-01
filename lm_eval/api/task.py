@@ -1345,6 +1345,56 @@ class ConfigurableTask(Task):
             request_type=self.OUTPUT_TYPE, doc=doc, arguments=arguments, idx=0, **kwargs
         )
 
+    def validate_and_fix_shapes(lls: np.ndarray, completion_len: np.ndarray) -> np.ndarray:
+        """
+        Validates if lls and completion_len arrays have compatible shapes for broadcasting.
+        If not compatible, reshapes completion_len to match lls's shape.
+        
+        Args:
+            lls: numpy array of log-likelihoods
+            completion_len: numpy array of completion lengths
+            
+        Returns:
+            Modified completion_len array with compatible broadcasting shape
+            
+        Raises:
+            ValueError: If arrays cannot be made compatible for broadcasting
+        """
+        # Convert inputs to numpy arrays if they aren't already
+        lls = np.asarray(lls)
+        completion_len = np.asarray(completion_len)
+        
+        # Get the shapes
+        lls_shape = lls.shape
+        completion_shape = completion_len.shape
+        
+        # Check if shapes are already compatible for broadcasting
+        try:
+            # If this succeeds, shapes are compatible
+            np.broadcast_shapes(lls_shape, completion_shape)
+            return completion_len
+        except ValueError:
+            # Shapes are incompatible - attempt to fix
+            print(f"Shapes {lls} and {completion_len} are not compatible for broadcasting.")
+            # For 1D arrays (most common case)
+            if len(lls_shape) == 1 and len(completion_shape) == 1:
+                if len(completion_len) == 1:
+                    # Broadcast single value to match lls length
+                    return np.full(lls_shape, completion_len[0])
+                elif len(completion_len) < len(lls):
+                    # Using mode='edge' to repeat the last valid value
+                    return np.pad(completion_len, (0, len(lls) - len(completion_len)), mode='edge')
+                else:
+                    # Truncate completion_len to match lls
+                    return completion_len[:len(lls)]
+            
+            # For multi-dimensional arrays
+            else:
+                raise ValueError(
+                    f"Cannot make arrays with shapes {lls_shape} and {completion_shape} "
+                    f"compatible for broadcasting. Multi-dimensional reshaping not supported."
+                )
+
     def process_results(self, doc, results):
         if callable(self.config.process_results):
             return self.config.process_results(doc, results)
@@ -1385,6 +1435,9 @@ class ConfigurableTask(Task):
             # retrieve choices in List[str] form, to compute choice lengths, etc.
             choices = self.doc_to_choice(doc)
             completion_len = np.array([float(len(i)) for i in choices])
+            
+            # Validate and fix shapes for broadcasting
+            completion_len = self.validate_and_fix_shapes(lls, completion_len)
 
             if (
                 2 * len(choices) == len(lls)

@@ -469,6 +469,11 @@ class EvaluationTracker:
         last_results_file = [
             f for f in results_files if latest_datetime.replace(":", "-") in f
         ][0]
+        if len(last_results_file) == 0:
+            if len(results_files) == 0:
+                eval_logger.warning(f"No results files found: {results_files}")
+                return
+            last_results_file = results_files[-1]
         last_results_file_path = hf_hub_url(
             repo_id=repo_id, filename=last_results_file, repo_type="dataset"
         )
