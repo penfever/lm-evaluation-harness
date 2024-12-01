@@ -485,7 +485,7 @@ def apply_template(template: str, doc: dict) -> str:
     except (ValueError, jinja2.exceptions.TemplateError) as e:
         # Optionally log the error here
         # logger.error(f"Template error: {e}")
-        return ""
+        return "null"
 
 
 def create_iterator(raw_iterator, *, rank=0, world_size=1, limit=None):
