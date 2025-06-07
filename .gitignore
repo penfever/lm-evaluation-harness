@@ -12,6 +12,7 @@ build
 dist
 *.egg-info
 venv
+.venv/
 .vscode/
 temp
 __pycache__

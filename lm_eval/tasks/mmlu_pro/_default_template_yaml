@@ -12,14 +12,13 @@ filter_list:
   - name: "custom-extract"
     filter:
       - function: "regex"
-        regex_pattern: r"answer is \(?([ABCDEFGHIJ])\)?"
+        regex_pattern: 'answer is \(?([ABCDEFGHIJ])\)?'
         # regex_pattern: r".*[aA]nswer:\s*([A-J])",
       - function: "take_first"
 generation_kwargs:
   until:
-    - "</s>"
-    - "Q:"
-    - "<|im_end|>"
+    - "Question:"
+  max_gen_toks: 2048
   do_sample: false
   temperature: 0.0
 num_fewshot: 5
@@ -30,4 +29,4 @@ metric_list:
     ignore_case: true
     ignore_punctuation: true
 metadata:
-  version: 0.0
+  version: 2.1
