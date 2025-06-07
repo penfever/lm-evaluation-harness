@@ -33,6 +33,47 @@ HIGHER_IS_BETTER_SYMBOLS = {
 }
 
 
+def setup_logging(verbosity=logging.INFO):
+    # Configure the root logger
+    class CustomFormatter(logging.Formatter):
+        def format(self, record):
+            if record.name.startswith("lm_eval."):
+                record.name = record.name[len("lm_eval.") :]
+            return super().format(record)
+
+    formatter = CustomFormatter(
+        "%(asctime)s %(levelname)-8s [%(name)s:%(lineno)d] %(message)s",
+        datefmt="%Y-%m-%d:%H:%M:%S",
+    )
+
+    log_level = os.environ.get("LOGLEVEL", verbosity) or verbosity
+
+    level_map = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL,
+    }
+
+    log_level = level_map.get(str(log_level).upper(), logging.INFO)
+
+    if not logging.root.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+
+        root_logger = logging.getLogger()
+        root_logger.addHandler(handler)
+        root_logger.setLevel(log_level)
+
+        if log_level == logging.DEBUG:
+            third_party_loggers = ["urllib3", "filelock", "fsspec"]
+            for logger_name in third_party_loggers:
+                logging.getLogger(logger_name).setLevel(logging.INFO)
+    else:
+        logging.getLogger().setLevel(log_level)
+
+
 def hash_string(string: str) -> str:
     return hashlib.sha256(string.encode("utf-8")).hexdigest()
 
