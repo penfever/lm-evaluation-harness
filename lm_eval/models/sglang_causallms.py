@@ -70,9 +70,9 @@ class SGLangLM(TemplateLM):
             )
 
         assert "cuda" in device or device is None, "SGLang only supports CUDA"
-        assert context_length is None or max_model_len is None, (
-            "Either context_length or max_model_len may be provided, but not both"
-        )
+        assert (
+            context_length is None or max_model_len is None
+        ), "Either context_length or max_model_len may be provided, but not both"
         # Initialize your sglang model here
         self._max_length = (
             max_model_len if max_model_len is not None else context_length

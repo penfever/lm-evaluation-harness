@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+
 def doc_to_target(doc: Dict) -> List[int]:
     """Return list of indices of accepted answers (all of them)."""
     remaining = _remove_prefixes(doc["answers"])

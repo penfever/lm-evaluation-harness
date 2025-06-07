@@ -12,10 +12,10 @@ from dataclasses import asdict, is_dataclass
 from itertools import islice
 from typing import Any, Callable, List
 
+import jinja2
 import numpy as np
 import yaml
 from jinja2 import BaseLoader, Environment, StrictUndefined
-import jinja2
 
 
 logging.basicConfig(
@@ -523,7 +523,7 @@ def apply_template(template: str, doc: dict) -> str:
     try:
         rtemplate = env.from_string(template)
         return rtemplate.render(**doc)
-    except (ValueError, jinja2.exceptions.TemplateError) as e:
+    except (ValueError, jinja2.exceptions.TemplateError):
         # Optionally log the error here
         # logger.error(f"Template error: {e}")
         return "null"

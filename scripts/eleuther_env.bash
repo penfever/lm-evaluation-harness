@@ -1,7 +1,7 @@
 #!/bin/bash
 
 args=''
-for i in "$@"; do 
+for i in "$@"; do
   i="${i//\\/\\\\}"
   args="$args \"${i//\"/\\\"}\""
 done

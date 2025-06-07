@@ -17,7 +17,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK;
 export MASTER_PORT=$(shuf -i 10000-65500 -n 1);
 export MASTER_ADDR="$(hostname -s).hpc.nyu.edu";
 
-#python /scratch/bf996/lm-evaluation-harness/scripts/check_if_results_exist.py nyu-dice-lab/lm-eval-results-bardsai/jaskier-7b-dpo-v5.6 && 
+#python /scratch/bf996/lm-evaluation-harness/scripts/check_if_results_exist.py nyu-dice-lab/lm-eval-results-bardsai/jaskier-7b-dpo-v5.6 &&
 
 srun \
     /bin/bash /scratch/bf996/lm-evaluation-harness/scripts/eleuther_env.bash \

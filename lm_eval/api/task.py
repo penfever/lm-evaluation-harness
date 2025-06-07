@@ -461,7 +461,9 @@ class Task(abc.ABC):
                 system_instruction=system_instruction,
                 apply_chat_template=apply_chat_template,
                 fewshot_as_multiturn=fewshot_as_multiturn,
-                chat_template=getattr(lm, "apply_chat_template", None) if apply_chat_template else None,
+                chat_template=getattr(lm, "apply_chat_template", None)
+                if apply_chat_template
+                else None,
                 gen_prefix=self.doc_to_prefix(doc),
             )
 
@@ -471,7 +473,9 @@ class Task(abc.ABC):
                 ctx=fewshot_ctx,
                 metadata=(self.config["task"], doc_id, self.config.repeats),
                 apply_chat_template=apply_chat_template,
-                chat_template=getattr(lm, "apply_chat_template", None) if apply_chat_template else None,
+                chat_template=getattr(lm, "apply_chat_template", None)
+                if apply_chat_template
+                else None,
             )
 
             if not isinstance(inst, list):
@@ -702,9 +706,9 @@ class Task(abc.ABC):
     ) -> Iterator[Tuple[int, Any]]:
         if samples:
             n = len(self.eval_docs)
-            assert all([e < n for e in samples]), (
-                f"Elements of --samples should be in the interval [0,k-1] where k is the number of total examples. In this case, k={n}."
-            )
+            assert all(
+                [e < n for e in samples]
+            ), f"Elements of --samples should be in the interval [0,k-1] where k is the number of total examples. In this case, k={n}."
             eval_logger.info(
                 f"{self.config.task}: Evaluating on {len(samples)} examples"
             )
@@ -1093,7 +1097,7 @@ class ConfigurableTask(Task):
         fewshot_as_multiturn: bool = False,
         chat_template: Optional[Callable] = None,
         gen_prefix: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Union[str, List[str]]:
         """Returns a fewshot context string that is made up of a prepended description
         (if provided), the `num_fewshot` number of examples, and an appended prompt example.
@@ -1541,29 +1545,31 @@ class ConfigurableTask(Task):
         )
 
     @staticmethod
-    def validate_and_fix_shapes(lls: np.ndarray, completion_len: np.ndarray) -> np.ndarray:
+    def validate_and_fix_shapes(
+        lls: np.ndarray, completion_len: np.ndarray
+    ) -> np.ndarray:
         """
         Validates if lls and completion_len arrays have compatible shapes for broadcasting.
         If not compatible, reshapes completion_len to match lls's shape.
-        
+
         Args:
             lls: numpy array of log-likelihoods
             completion_len: numpy array of completion lengths
-            
+
         Returns:
             Modified completion_len array with compatible broadcasting shape
-            
+
         Raises:
             ValueError: If arrays cannot be made compatible for broadcasting
         """
         # Convert inputs to numpy arrays if they aren't already
         lls = np.asarray(lls)
         completion_len = np.asarray(completion_len)
-        
+
         # Get the shapes
         lls_shape = lls.shape
         completion_shape = completion_len.shape
-        
+
         # Check if shapes are already compatible for broadcasting
         try:
             # If this succeeds, shapes are compatible
@@ -1571,7 +1577,9 @@ class ConfigurableTask(Task):
             return completion_len
         except ValueError:
             # Shapes are incompatible - attempt to fix
-            print(f"Shapes {lls} and {completion_len} are not compatible for broadcasting.")
+            print(
+                f"Shapes {lls} and {completion_len} are not compatible for broadcasting."
+            )
             # For 1D arrays (most common case)
             if len(lls_shape) == 1 and len(completion_shape) == 1:
                 if len(completion_len) == 1:
@@ -1579,11 +1587,13 @@ class ConfigurableTask(Task):
                     return np.full(lls_shape, completion_len[0])
                 elif len(completion_len) < len(lls):
                     # Using mode='edge' to repeat the last valid value
-                    return np.pad(completion_len, (0, len(lls) - len(completion_len)), mode='edge')
+                    return np.pad(
+                        completion_len, (0, len(lls) - len(completion_len)), mode="edge"
+                    )
                 else:
                     # Truncate completion_len to match lls
-                    return completion_len[:len(lls)]
-            
+                    return completion_len[: len(lls)]
+
             # For multi-dimensional arrays
             else:
                 raise ValueError(
@@ -1631,9 +1641,11 @@ class ConfigurableTask(Task):
             # retrieve choices in List[str] form, to compute choice lengths, etc.
             choices = self.doc_to_choice(doc)
             completion_len = np.array([float(len(i)) for i in choices])
-            
+
             # Validate and fix shapes for broadcasting
-            completion_len = ConfigurableTask.validate_and_fix_shapes(lls, completion_len)
+            completion_len = ConfigurableTask.validate_and_fix_shapes(
+                lls, completion_len
+            )
 
             if (
                 2 * len(choices) == len(lls)
